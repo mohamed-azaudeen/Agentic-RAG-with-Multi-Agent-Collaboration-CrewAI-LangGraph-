@@ -3,7 +3,14 @@ import requests
 import time
 import os
 
-BASE_URL = "https://Azar-Mhmd-Agentic-RAG-Chatbot.hf.space"
+def get_backend_url():
+    repo_id = os.getenv("SPACE_ID")
+    if repo_id:
+        user, space = repo_id.split("/")
+        return f"https://{user}-{space.replace('_', '-')}.hf.space"
+    return "http://localhost:8000"
+
+BASE_URL = get_backend_url()
 
 st.set_page_config(page_title="Agentic RAG Bot", page_icon="🤖", layout="wide")
 
