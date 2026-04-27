@@ -3,12 +3,7 @@ import requests
 import time
 import os
 
-def get_backend_url():
-    if os.getenv("SPACE_ID"):
-        return "" 
-    return "http://localhost:8000"
-
-BASE_URL = get_backend_url()
+BASE_URL = "http://127.0.0.1:8000"
 
 st.set_page_config(page_title="Agentic RAG Bot", page_icon="🤖", layout="wide")
 
