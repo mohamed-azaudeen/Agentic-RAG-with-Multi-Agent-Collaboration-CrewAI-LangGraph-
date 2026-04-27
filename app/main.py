@@ -6,6 +6,7 @@ from typing import List, Optional
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 from workflow.graph import workflow
 from ingestion.loader import load_documents
@@ -15,6 +16,14 @@ from mcp_config.tools import direct_vector_search
 
 load_dotenv()
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],  
+    allow_headers=["*"],  
+)
 
 logging.basicConfig(
     level=logging.INFO,
