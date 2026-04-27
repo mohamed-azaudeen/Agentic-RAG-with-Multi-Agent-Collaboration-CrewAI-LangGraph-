@@ -1,0 +1,17 @@
+# Credentials
+.env
+
+# Python
+__pycache__/
+.venv/
+*.pyc
+
+# Project Specific
+data/
+notes/
+summaries/*
+vectorstore/
+!summaries/.gitkeep
+
+# OS
+.DS_Store

@@ -1,0 +1,26 @@
+name : Sync to Hugging Face Hub
+
+on:
+    push:
+        branches: ["main"]
+    workflow_dispatch:
+
+jobs:
+    build-and-sync:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+                lfs: true
+
+            - name: Push to Hugging Face
+              env:
+                HF_SYNC: ${{ secrets.HF_SYNC_AGENTIC_RAG }}
+              run: |
+               git config --global user.email "azarudeen48@gmail.com"
+               git config --global user.name "Azar-Mhmd"
+               git remote rm hf || true
+               git remote add hf https://Azar-Mhmd:$HF_SYNC@huggingface.co/spaces/Azar-Mhmd/Agentic-RAG-Chatbot
+               git push --force hf main

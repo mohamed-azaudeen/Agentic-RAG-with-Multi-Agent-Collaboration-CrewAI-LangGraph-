@@ -1,0 +1,44 @@
+# Core
+fastapi
+uvicorn
+streamlit
+python-dotenv
+
+# RAG + NLP
+transformers
+sentence-transformers
+faiss-cpu
+langchain
+langchain-community
+langchain-ollama
+langchain-google-genai>=2.0.0
+google-genai>=1.0.0
+langchain-huggingface
+torch
+torchvision
+litellm>=1.77.0
+
+# Document ingestion
+pypdf
+python-docx
+unstructured
+pydantic
+python-multipart
+
+# Agents / Workflow
+crewai
+networkx
+
+# MCP (Model Context Protocol)
+mcp
+
+# Utilities
+numpy
+pandas
+tqdm
+requests
+
+
+
+
+
