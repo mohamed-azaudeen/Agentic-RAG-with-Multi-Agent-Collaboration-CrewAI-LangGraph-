@@ -26,16 +26,18 @@ with st.sidebar:
         if st.button("🚀 Upload & Process"):
             with st.spinner("Uploading and indexing..."):
                 try:
+                    INTERNAL_URL = "http://127.0.0.1:8000/ingest"
+                    
                     files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
-                    response = requests.post(f"{BASE_URL}/ingest", files=files)
+                    response = requests.post(INTERNAL_URL, files=files)
                     
                     if response.status_code == 200:
-                        st.success(f"✅ {uploaded_file.name} is now in Knowledge Base!")
+                        st.success(f"✅ {uploaded_file.name} uploaded successfully!")
                         st.toast("Ingestion started!", icon="🚀")
                     else:
                         st.error(f"Upload Failed: {response.status_code} - {response.text}")
                 except Exception as e:
-                    st.error(f"Connection Error: {e}")
+                    st.error(f"Internal Connection Error: {e}")
 
 st.title("📲 Agentic RAG Explorer")
 st.markdown("""
