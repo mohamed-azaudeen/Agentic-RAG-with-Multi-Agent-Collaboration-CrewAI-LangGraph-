@@ -1,8 +1,9 @@
 import streamlit as st
 import requests
 import time
+import os
 
-API_URL = "http://localhost:8000"
+BASE_URL = "https://Azar-Mhmd-Agentic-RAG-Chatbot.hf.space"
 
 st.set_page_config(page_title="Agentic RAG Bot", page_icon="🤖", layout="wide")
 
@@ -10,34 +11,35 @@ with st.sidebar:
     st.header("⚙️ System Status")
     if st.button("Check Backend Health"):
         try:
-            health = requests.get(f"{API_URL}/health").json()
+            health = requests.get(f"{BASE_URL}/health").json()
             st.success(f"Backend: {health['status']}")
             st.info(f"Gemini API: {health['google_api']}")
             st.info(f"Groq API: {health['groq_api']}")
-        except:
-            st.error("Backend Offline")
+        except Exception as e:
+            st.error(f"Backend Offline: {e}")
     
     st.divider()
     st.subheader("📁 Document Management")
     uploaded_file = st.file_uploader("Add to Knowledge Base", type=["txt", "pdf", "docx", "csv"])
     
     if uploaded_file is not None:
-        with open(f"data/{uploaded_file.name}", "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        st.success(f"Uploaded {uploaded_file.name}")
+        if st.button("🚀 Upload & Process"):
+            with st.spinner("Uploading and indexing..."):
+                try:
+                    files = {"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type)}
+                    response = requests.post(f"{BASE_URL}/ingest", files=files)
+                    
+                    if response.status_code == 200:
+                        st.success(f"✅ {uploaded_file.name} is now in Knowledge Base!")
+                        st.toast("Ingestion started!", icon="🚀")
+                    else:
+                        st.error(f"Upload Failed: {response.status_code} - {response.text}")
+                except Exception as e:
+                    st.error(f"Connection Error: {e}")
 
-        with st.spinner("Updating Vectorstore..."):
-            response = requests.post(f"{API_URL}/ingest", json={"filename": uploaded_file.name})
-            if response.status_code == 200:
-                st.toast("Ingestion started in background!", icon="✅")
-            else:
-                st.error("Ingestion failed.")
-
-
-
-st.title("🤖 Agentic RAG Explorer")
+st.title("📲 Agentic RAG Explorer")
 st.markdown("""
-*Powered by **CrewAI** (Summarizer, Architect, Citation, Critic) & **MCP***
+*Powered by **CrewAI** & **LangGraph***
 """)
 
 if "messages" not in st.session_state:
@@ -47,7 +49,7 @@ for msg in st.session_state["messages"]:
     with st.chat_message(msg["role"]):
         st.write(msg["content"])
 
-if query := st.chat_input("Ask about your documents (e.g., 'What is the remote work policy?')"):
+if query := st.chat_input("Ask about your documents..."):
     st.session_state["messages"].append({"role": "user", "content": query})
     with st.chat_message("user"):
         st.write(query)
@@ -56,28 +58,30 @@ if query := st.chat_input("Ask about your documents (e.g., 'What is the remote w
         status_placeholder = st.empty()
         with status_placeholder.status("🚀 Crew is collaborating...", expanded=True) as status:
             st.write("🔍 Searching FAISS vectorstore...")
-            # We use a POST request to our FastAPI /ask endpoint
             try:
-                response = requests.post(f"{API_URL}/ask", json={"query": query}, timeout=300)
+                response = requests.post(
+                    f"{BASE_URL}/ask", 
+                    json={"query": query}, 
+                    timeout=300
+                )
                 
                 if response.status_code == 200:
                     data = response.json()
                     answer = data.get("answer")
                     latency = data.get("latency")
                     
-                    st.write(f"📝 Summarizing context with Gemini Flash...")
-                    st.write(f"⚖️ Verifying citations and auditing with Llama 70B...")
+                    st.write(f"⚖️ Finalizing audit...")
                     status.update(label=f"✅ Complete ({latency})", state="complete", expanded=False)
                     
                     st.write(answer)
                     st.session_state["messages"].append({"role": "assistant", "content": answer})
                 else:
-                    status.update(label="❌ Error", state="error")
-                    st.error(f"Backend Error: {response.text}")
+                    status.update(label="❌ Backend Error", state="error")
+                    st.error(f"Error {response.status_code}: {response.text}")
             
             except requests.exceptions.Timeout:
                 status.update(label="🕒 Timeout", state="error")
-                st.error("The request took too long. Check if your MCP servers are running.")
+                st.error("The agents are taking a long time. This is normal for 70B models.")
             except Exception as e:
                 status.update(label="⚠️ Connection Failed", state="error")
                 st.error(f"Could not reach FastAPI: {e}")
