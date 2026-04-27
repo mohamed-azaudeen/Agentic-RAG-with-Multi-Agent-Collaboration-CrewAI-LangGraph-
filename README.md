@@ -1,3 +1,13 @@
+---
+title: Agentic RAG Chatbot
+emoji: 🤖
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Agentic RAG with Multi-Agent Collaboration (CrewAI + LangGraph)
 
 [![CrewAI](https://img.shields.io/badge/Framework-CrewAI-red)](https://crewai.com)
