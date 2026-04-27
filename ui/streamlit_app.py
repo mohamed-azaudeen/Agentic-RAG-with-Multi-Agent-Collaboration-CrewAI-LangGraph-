@@ -6,7 +6,7 @@ import os
 def get_backend_url():
     repo_id = os.getenv("SPACE_ID")
     if repo_id:
-        user, space = repo_id.split("/")
+        user, space = repo_id.lower().split("/")
         return f"https://{user}-{space.replace('_', '-')}.hf.space"
     return "http://localhost:8000"
 
